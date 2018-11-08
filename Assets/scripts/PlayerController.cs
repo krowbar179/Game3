@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour {
 
@@ -51,6 +52,20 @@ public class PlayerController : MonoBehaviour {
             if (Input.GetKey(KeyCode.A))
             {
                 Player.SimpleMove(Vector3.Normalize(transform.right) * -speed);
+            }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                RaycastHit hit;
+                Ray ray = new Ray(transform.position, transform.forward);
+                if(Physics.Raycast(ray, out hit, 5.0f))
+                {
+                    GameObject obj = hit.transform.gameObject;
+                    if (obj.GetComponent<Interactable>())
+                    {
+                        ExecuteEvents.Execute<InteractionHandler>(obj, null, (x, y) => x.OnClick());
+                    }
+                }
             }
         }
         if (Input.GetKeyDown(KeyCode.Tab))

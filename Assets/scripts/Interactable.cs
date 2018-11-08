@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Interactable : MonoBehaviour, IPointerClickHandler
+public interface InteractionHandler : IEventSystemHandler
+{
+    void OnClick();
+}
+
+public class Interactable : MonoBehaviour, InteractionHandler
 {
     private Rigidbody body;
     // Use this for initialization
@@ -18,7 +23,7 @@ public class Interactable : MonoBehaviour, IPointerClickHandler
 
     }
 
-    public void OnPointerClick(PointerEventData data)
+    public void OnClick()
     {
         body.AddForce(new Vector3(0, 10, 0), ForceMode.VelocityChange);
     }
