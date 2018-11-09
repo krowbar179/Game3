@@ -3,28 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public interface InteractionHandler : IEventSystemHandler
+namespace interact
 {
-    void OnClick();
+
+    public interface InteractionHandler : IEventSystemHandler
+    {
+        void OnClick();
+    }
+
 }
 
-public class Interactable : MonoBehaviour, InteractionHandler
+public class Interactable : MonoBehaviour
 {
-    private Rigidbody body;
-    // Use this for initialization
-    void Start()
-    {
-        body = GetComponent<Rigidbody>();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    public void OnClick()
-    {
-        body.AddForce(new Vector3(0, 10, 0), ForceMode.VelocityChange);
-    }
+    //This class literally exists only as a flag that an object has one of many possible InteractionHandle components
 }
