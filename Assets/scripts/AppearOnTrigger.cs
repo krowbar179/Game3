@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using interact;
 
-public class AppearOnTrigger : MonoBehaviour
+public class AppearOnTrigger : MonoBehaviour, InteractionHandler
 {
 
     private Image image;
@@ -51,7 +52,8 @@ public class AppearOnTrigger : MonoBehaviour
         
 
     }
-    void Trigger()
+
+    public void Trigger()
     {
         if (clear)
         {

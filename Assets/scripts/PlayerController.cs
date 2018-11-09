@@ -9,12 +9,16 @@ public class PlayerController : MonoBehaviour {
     public float HMouseSpeed;
     public float VMouseSpeed;
 
+    private enum State { Roam, Read, Inventory};
+    private State state;
+
+    private GameObject UI;
+    private GameObject cursor;
+
     private float speed;
     private CharacterController Player;
     private float pitch;
     private float yaw;
-
-    private bool locked;
 
 	// Use this for initialization
 	void Start () {
@@ -25,14 +29,40 @@ public class PlayerController : MonoBehaviour {
         yaw = 0.0f;
         pitch = 0.0f;
 
-        locked = true;
+        state = State.Roam;
 
         Cursor.lockState = CursorLockMode.Locked;
+
+        UI = GameObject.Find("/Canvas");
+        cursor = GameObject.Find("/Canvas/Cursor");
 	}
+
+    void ChangeState()
+    {
+        if(state == State.Roam)
+        {
+            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger());
+            Cursor.lockState = CursorLockMode.None;
+            state = State.Inventory;
+        }
+        else if(state == State.Read)
+        {
+            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger());
+            Cursor.lockState = CursorLockMode.Locked;
+            state = State.Roam;
+        }
+        else if(state == State.Inventory)
+        {
+            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger());
+            Cursor.lockState = CursorLockMode.Locked;
+            state = State.Roam;
+
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        if (locked)
+        if (state == State.Roam)
         {
             yaw += HMouseSpeed * Input.GetAxis("Mouse X");
             pitch -= VMouseSpeed * Input.GetAxis("Mouse Y");
@@ -64,23 +94,14 @@ public class PlayerController : MonoBehaviour {
                     GameObject obj = hit.transform.gameObject;
                     if (obj.GetComponent<Interactable>())
                     {
-                        ExecuteEvents.Execute<InteractionHandler>(obj, null, (x, y) => x.OnClick());
+                        ExecuteEvents.Execute<InteractionHandler>(obj, null, (x, y) => x.Trigger());
                     }
                 }
             }
         }
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            if (locked)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                locked = false;
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                locked = true;
-            }
+            ChangeState();
         }
     }
 }

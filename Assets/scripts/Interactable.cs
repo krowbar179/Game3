@@ -8,7 +8,7 @@ namespace interact
 
     public interface InteractionHandler : IEventSystemHandler
     {
-        void OnClick();
+        void Trigger();
     }
 
 }

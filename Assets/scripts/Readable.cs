@@ -19,7 +19,7 @@ public class Readable : MonoBehaviour, InteractionHandler {
 		
 	}
 
-    public void OnClick()
+    public void Trigger()
     {
 
     }
