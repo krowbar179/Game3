@@ -6,15 +6,26 @@ using interact;
 
 public class Readable : MonoBehaviour, InteractionHandler {
 
-    InfoPacket packet;
-
+    
+    public bool hasBeenRead;
+    public string[] FirstRead;
+    public string[] SubsequentRead;
+    public string ImportantText;
+    public doodadType myType;
 	// Use this for initialization
 	void Start () {
-        packet = GetComponent<InfoPacket>();
+        hasBeenRead = false;
 	}
 
     public void Trigger(GameObject player)
     {
-        ExecuteEvents.Execute<ReactionHandler>(player, null, (x, y) => x.Process(packet));
+        if (!hasBeenRead) {
+            ExecuteEvents.Execute<ReactionHandler>(player, null, (x, y) => x.Process(new InfoPacket(FirstRead, ImportantText, myType)));
+            hasBeenRead = true;
+        }
+        else
+        {
+            ExecuteEvents.Execute<ReactionHandler>(player, null, (x, y) => x.Process(new InfoPacket(SubsequentRead, ImportantText, myType)));
+        }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using interact;
+using visible;
 public interface ReactionHandler : IEventSystemHandler
 {
     void Process(InfoPacket packet);
@@ -18,6 +20,8 @@ public class PlayerController : MonoBehaviour, ReactionHandler {
 
     private GameObject UI;
     private GameObject cursor;
+    private GameObject textBox;
+    private GameObject text;
 
     private float speed;
     private CharacterController Player;
@@ -25,6 +29,7 @@ public class PlayerController : MonoBehaviour, ReactionHandler {
     private float yaw;
 
     private InfoPacket myPacket;
+    private int packetPage;
 
 	// Use this for initialization
 	void Start () {
@@ -41,6 +46,8 @@ public class PlayerController : MonoBehaviour, ReactionHandler {
 
         UI = GameObject.Find("/Canvas");
         cursor = GameObject.Find("/Canvas/Cursor");
+        textBox = GameObject.Find("/Canvas/Text Box");
+        text = GameObject.Find("/Canvas/Text Box/Text");
 
         myPacket = null;
 	}
@@ -48,15 +55,20 @@ public class PlayerController : MonoBehaviour, ReactionHandler {
     public void Process(InfoPacket packet)
     {
         myPacket = packet;
+        packetPage = 0;
+        text.GetComponent<Text>().text = myPacket.contents[packetPage];
         ChangeState(true);
+    }
+
+    void stashPacket()
+    {
+        myPacket = null;
     }
 
     void ChangeState(bool ReceivedPacket)
     {
         if(state == State.Roam)
         {
-            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger(this.transform.gameObject));
-            Cursor.lockState = CursorLockMode.None;
             if (ReceivedPacket)
             {
                 state = State.Read;
@@ -65,16 +77,25 @@ public class PlayerController : MonoBehaviour, ReactionHandler {
             {
                 state = State.Inventory;
             }
+            ExecuteEvents.Execute<VisibilityHandler>(cursor, null, (x, y) => x.Visible());
+            ExecuteEvents.Execute<VisibilityHandler>(textBox, null, (x, y) => x.Visible());
+            ExecuteEvents.Execute<VisibilityHandler>(text, null, (x, y) => x.Visible());
+            Cursor.lockState = CursorLockMode.None;
         }
         else if(state == State.Read)
         {
-            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger(this.transform.gameObject));
+            stashPacket();
+            ExecuteEvents.Execute<VisibilityHandler>(cursor, null, (x, y) => x.Visible());
+            ExecuteEvents.Execute<VisibilityHandler>(textBox, null, (x, y) => x.Visible());
+            ExecuteEvents.Execute<VisibilityHandler>(text, null, (x, y) => x.Visible());
             Cursor.lockState = CursorLockMode.Locked;
             state = State.Roam;
         }
         else if(state == State.Inventory)
         {
-            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger(this.transform.gameObject));
+            ExecuteEvents.Execute<VisibilityHandler>(cursor, null, (x, y) => x.Visible());
+            ExecuteEvents.Execute<VisibilityHandler>(textBox, null, (x, y) => x.Visible());
+            ExecuteEvents.Execute<VisibilityHandler>(text, null, (x, y) => x.Visible());
             Cursor.lockState = CursorLockMode.Locked;
             state = State.Roam;
 
@@ -120,6 +141,23 @@ public class PlayerController : MonoBehaviour, ReactionHandler {
                 }
             }
         }
+
+        if(state == State.Read)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                packetPage++;
+                if(packetPage < myPacket.contents.Length)
+                {
+                    text.GetComponent<Text>().text = myPacket.contents[packetPage];
+                }
+                else
+                {
+                    ChangeState(false);
+                }
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ChangeState(false);

@@ -2,14 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using interact;
+using visible;
 
-public class AppearOnTrigger : MonoBehaviour, InteractionHandler
+namespace visible
+{
+    public interface VisibilityHandler : IEventSystemHandler
+    {
+        void Visible();
+    }
+}
+
+public class AppearOnTrigger : MonoBehaviour, VisibilityHandler
 {
 
     private Image image;
     private Text text;
     private Color originalColor;
+    private Color clearColor;
+    private List<GameObject> childList;
+    private Transform[] children;
+
     public bool clear;
 
     // Use this for initialization
@@ -28,14 +42,17 @@ public class AppearOnTrigger : MonoBehaviour, InteractionHandler
         if (text)
         {
             originalColor = text.color;
+            originalColor.a = 1;
+            clearColor = originalColor;
+            clearColor.a = 0;
             if (clear)
             {
-                text.color = Color.clear;
+                text.color = clearColor;
             }
         }
-        
-        List<GameObject> childList = new List<GameObject>();
-        Transform[] children = GetComponentsInChildren<Transform>(true);
+        /*
+        childList = new List<GameObject>();
+        children = GetComponentsInChildren<Transform>(true);
         for (int i = 0; i < children.Length; i++)
         {
             Transform child = children[i];
@@ -49,11 +66,11 @@ public class AppearOnTrigger : MonoBehaviour, InteractionHandler
             AppearOnTrigger AOT = childList[i].AddComponent<AppearOnTrigger>();
             AOT.clear = clear;
         }
-        
+        */
 
     }
 
-    public void Trigger(GameObject obj)
+    public void Visible()
     {
         if (clear)
         {
@@ -75,10 +92,17 @@ public class AppearOnTrigger : MonoBehaviour, InteractionHandler
             }
             if (text)
             {
-                text.color = Color.clear;
+                text.color = clearColor;
             }
             clear = true;
         }
+        /*
+        for (int i = 0; i < childList.Count; i++)
+        {
+            childList[i].GetComponent<AppearOnTrigger>().clear = clear;
+            //ExecuteEvents.Execute<InteractionHandler>(this.gameObject, null, (x, y) => x.Trigger(null));
+        }
+        */
     }
 
 }

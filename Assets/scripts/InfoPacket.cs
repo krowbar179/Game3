@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InfoPacket : MonoBehaviour {
+public enum doodadType { Document, Key, Door };
 
-    public string[] FirstRead;
-    public string[] SubsequentRead;
+public class InfoPacket{
+
+    public string[] contents;
     public string ImportantText;
 
-    public enum doodadType { Document, Key, Door };
-
     public doodadType myType;
-    public bool hasBeenRead;
 
 	// Use this for initialization
-	void Start () {
-        hasBeenRead = false;
+	public InfoPacket (string[] c, string i, doodadType type) {
+        contents = c;
+        ImportantText = i;
+        myType = type;
 	}
 	
 }
