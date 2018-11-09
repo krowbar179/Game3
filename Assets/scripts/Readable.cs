@@ -1,26 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using interact;
 
 public class Readable : MonoBehaviour, InteractionHandler {
 
-    string readtext;
-    string copytext;
-    bool hasBeenRead;
+    InfoPacket packet;
 
 	// Use this for initialization
 	void Start () {
-        hasBeenRead = false;	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+        packet = GetComponent<InfoPacket>();
 	}
 
-    public void Trigger()
+    public void Trigger(GameObject player)
     {
-
+        ExecuteEvents.Execute<ReactionHandler>(player, null, (x, y) => x.Process(packet));
     }
 }

@@ -53,7 +53,7 @@ public class AppearOnTrigger : MonoBehaviour, InteractionHandler
 
     }
 
-    public void Trigger()
+    public void Trigger(GameObject obj)
     {
         if (clear)
         {

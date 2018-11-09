@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using interact;
+public interface ReactionHandler : IEventSystemHandler
+{
+    void Process(InfoPacket packet);
+}
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour, ReactionHandler {
 
     public float HMouseSpeed;
     public float VMouseSpeed;
@@ -19,6 +23,8 @@ public class PlayerController : MonoBehaviour {
     private CharacterController Player;
     private float pitch;
     private float yaw;
+
+    private InfoPacket myPacket;
 
 	// Use this for initialization
 	void Start () {
@@ -35,25 +41,40 @@ public class PlayerController : MonoBehaviour {
 
         UI = GameObject.Find("/Canvas");
         cursor = GameObject.Find("/Canvas/Cursor");
+
+        myPacket = null;
 	}
 
-    void ChangeState()
+    public void Process(InfoPacket packet)
+    {
+        myPacket = packet;
+        ChangeState(true);
+    }
+
+    void ChangeState(bool ReceivedPacket)
     {
         if(state == State.Roam)
         {
-            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger());
+            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger(this.transform.gameObject));
             Cursor.lockState = CursorLockMode.None;
-            state = State.Inventory;
+            if (ReceivedPacket)
+            {
+                state = State.Read;
+            }
+            else
+            {
+                state = State.Inventory;
+            }
         }
         else if(state == State.Read)
         {
-            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger());
+            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger(this.transform.gameObject));
             Cursor.lockState = CursorLockMode.Locked;
             state = State.Roam;
         }
         else if(state == State.Inventory)
         {
-            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger());
+            ExecuteEvents.Execute<InteractionHandler>(cursor, null, (x, y) => x.Trigger(this.transform.gameObject));
             Cursor.lockState = CursorLockMode.Locked;
             state = State.Roam;
 
@@ -94,14 +115,14 @@ public class PlayerController : MonoBehaviour {
                     GameObject obj = hit.transform.gameObject;
                     if (obj.GetComponent<Interactable>())
                     {
-                        ExecuteEvents.Execute<InteractionHandler>(obj, null, (x, y) => x.Trigger());
+                        ExecuteEvents.Execute<InteractionHandler>(obj, null, (x, y) => x.Trigger(this.transform.gameObject));
                     }
                 }
             }
         }
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            ChangeState();
+            ChangeState(false);
         }
     }
 }
