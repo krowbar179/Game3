@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/EmployeeOffice2.unity
+- path: Assets/Completed Scenes/level3v1.unity
   isLoaded: 1
   isActive: 1
